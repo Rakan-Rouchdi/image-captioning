@@ -1,0 +1,11 @@
+flask
+ultralytics
+openai
+torch
+torchvision
+Pillow
+numpy
+psutil
+matplotlib
+scikit-learn
+transformers  # Optional if using local LLM
