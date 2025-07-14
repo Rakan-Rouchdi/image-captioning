@@ -1,0 +1,9 @@
+{
+  "sample.jpg": [
+    { "label": "person", "bbox": [270, 95, 353, 285] },
+    { "label": "dog", "bbox": [445, 212, 483, 307] }
+  ],
+  "sample2.jpg": [
+    { "label": "person", "bbox": [315, 813, 494, 1029] }
+  ]
+}

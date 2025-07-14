@@ -1,0 +1,38 @@
+/* Full-screen gradient background */
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #0f172a, #1e293b);
+    color: #f1f5f9;
+    min-height: 100vh;
+  }
+  
+  /* Main card styling */
+  .gradient-card {
+    border: blue 3px solid;
+    border-radius: 40px;
+  }
+  
+  /* Caption box */
+  .caption-box {
+    background-color: #334155;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #f8fafc;
+    font-size: 1.1rem;
+  }
+  
+  /* Custom list appearance */
+  .custom-list {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    color: #e2e8f0;
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 576px) {
+    .gradient-card {
+      padding: 1.5rem;
+    }
+  }
+  

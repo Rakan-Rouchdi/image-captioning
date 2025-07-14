@@ -8,4 +8,7 @@ numpy
 psutil
 matplotlib
 scikit-learn
+python-dotenv
+nltk
+pycocoevalcap @ git+https://github.com/salaniz/pycocoevalcap.git
 transformers  # Optional if using local LLM
