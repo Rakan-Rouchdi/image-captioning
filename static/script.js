@@ -41,7 +41,7 @@ function showMeta(type) {
   }
   
   function handleFiles(files) {
-    clearFormMessage(); // 👈 Clear message when file is selected
+    clearFormMessage(); 
     const file = files[0];
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
@@ -102,6 +102,7 @@ function showMeta(type) {
   document.querySelector("form").addEventListener("submit", function (e) {
     const fileInput = document.getElementById("imageInput");
     const messageBox = document.getElementById("formMessage");
+    const loader = document.getElementById("loader"); 
   
     if (!fileInput.files || fileInput.files.length === 0) {
       e.preventDefault();
@@ -110,8 +111,9 @@ function showMeta(type) {
       messageBox.classList.add("error");
       return;
     }
+
+    if (loader) loader.classList.remove("d-none");
   
-    // Optional: clear message if form is valid
     messageBox.textContent = "";
     messageBox.classList.add("d-none");
   });

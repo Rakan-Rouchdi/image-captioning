@@ -1,5 +1,3 @@
-# utils/draw_boxes.py
-
 import cv2
 import os
 import random

@@ -1,5 +1,6 @@
 venv/
 uploads/
+outputs/
 __pycache__/
 .env
 .flaskenv

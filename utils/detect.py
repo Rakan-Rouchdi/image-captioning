@@ -1,9 +1,7 @@
-# utils/detect.py
-
 from ultralytics import YOLO
 import os
 
-# Load YOLO model (you can change to yolov8s or yolov8m if needed)
+# Load YOLO model 
 model = YOLO("yolov8n.pt")  # 'n' = nano (fast, lightweight)
 
 def detect_objects(image_path, confidence_threshold=0.3):
