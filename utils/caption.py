@@ -38,7 +38,7 @@ def build_prompt(objects, relationships, environment, style="default", context="
         "Use the information given to you to paint the picture, so you can deduce the image and context if possible.\n"
         "Capture the mood, activity, or emotion in the scene from a first-person perspective.\n"
         "Don't limit your imagination/creativity with additional info/context part use it as a guide but don't rely on it.\n"
-        "If additional context/info is provided - do not make it the center of content."
+        "If additional context/info is provided - do not make it the center of content.\n"
         "Avoid sounding robotic or overly literal — keep it smooth and realistic.\n"
         "Always ensure the caption sounds natural."
     )
