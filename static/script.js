@@ -102,7 +102,6 @@ function showMeta(type) {
   document.querySelector("form").addEventListener("submit", function (e) {
     const fileInput = document.getElementById("imageInput");
     const messageBox = document.getElementById("formMessage");
-    const loader = document.getElementById("loader"); 
   
     if (!fileInput.files || fileInput.files.length === 0) {
       e.preventDefault();
@@ -112,7 +111,12 @@ function showMeta(type) {
       return;
     }
 
-    if (loader) loader.classList.remove("d-none");
+    const submitText = document.getElementById("submitBtnText");
+    const submitSpinner = document.getElementById("submitSpinner");
+    submitText.classList.add("d-none");
+    submitSpinner.classList.remove("d-none");
+
+    document.getElementById("submitBtn").disabled = true;
   
     messageBox.textContent = "";
     messageBox.classList.add("d-none");

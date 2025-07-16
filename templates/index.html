@@ -63,13 +63,11 @@
 
         <div id="formMessage" class="form-message d-none"></div>
         <br>
-        <button type="submit" class="btn btn-primary w-100">Generate Caption</button>
+        <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+          <span id="submitBtnText">Generate Caption</span>
+          <span id="submitSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
+        </button>        
       </form>
-
-      <div id="loader" class="d-none text-center mt-4">
-        <div class="spinner-border text-primary" role="status"></div>
-        <span class="text-white ms-2">Analyzing image…</span>
-      </div>
 
       {% if image_url %}
         <article class="output-section fade-in">
