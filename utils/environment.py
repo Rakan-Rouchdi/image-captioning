@@ -1,7 +1,6 @@
-# utils/environment.py
-
 from PIL import Image
 import numpy as np
+from utils.scene_classifier import classify_scene
 
 def estimate_brightness(image_path):
     """Estimate brightness to guess day vs night."""
@@ -12,22 +11,44 @@ def estimate_brightness(image_path):
 
 def get_environmental_cue(image_path, object_labels):
     """
-    Infer environment based on detected objects and image brightness.
+    Infer environment using scene classification + detected objects + brightness.
     """
-    # Basic object heuristics
+
+    # 1. Try scene classification
+    try:
+        scene, confidence = classify_scene(image_path)
+    except Exception as e:
+        print(f"⚠️ Scene classification failed: {e}")
+        scene = None
+        confidence = 0
+
+    # 2. General fallback logic based on COCO-style categories
     labels = set(label.lower() for label in object_labels)
 
-    if {"car", "stop sign", "truck", "bicycle"}.intersection(labels):
-        location = "outdoor street scene"
-    elif {"sofa", "tv", "laptop", "table"}.intersection(labels):
-        location = "indoor room"
-    elif {"tree", "dog", "bench"}.intersection(labels):
-        location = "park or outdoor area"
-    else:
-        location = "general environment"
+    if confidence < 0.30:
+        # COCO-style generalized groups
+        indoor_objects = {"sofa", "tv", "laptop", "bed", "refrigerator", "oven", "sink", "dining table", "toilet"}
+        outdoor_street_objects = {"car", "truck", "bus", "bicycle", "motorcycle", "traffic light", "stop sign", "parking meter"}
+        nature_objects = {"tree", "bench", "dog", "cat", "horse", "bird"}
+        water_objects = {"boat", "surfboard"}
+        people_objects = {"person"}
 
-    # Estimate brightness
+        if labels & indoor_objects:
+            scene = "indoor environment"
+        elif labels & outdoor_street_objects:
+            scene = "urban outdoor scene"
+        elif labels & nature_objects:
+            scene = "natural outdoor area"
+        elif labels & water_objects:
+            scene = "near water or coastal scene"
+        elif labels & people_objects:
+            scene = "human activity area"
+        else:
+            scene = "unclassified environment"
+
+    # 3. Brightness estimation
     brightness = estimate_brightness(image_path)
     lighting = "in daylight" if brightness > 100 else "at night or in dim light"
 
-    return f"{location} {lighting}"
+    # Final combined cue
+    return f"{scene} {lighting}"

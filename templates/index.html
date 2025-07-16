@@ -3,66 +3,162 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Smart Image Captioning</title>
+  <title>AI Image Captioning</title>
 
-  <!-- Bootstrap 5 -->
+  <!-- Google Fonts & Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
 </head>
 <body>
-  <div class="container my-5">
-    <div class="mx-auto p-4 rounded-4 gradient-card shadow-lg" style="max-width: 900px;">
-      <h1 class="text-center mb-4 text-white">📸 Smart Image Captioning</h1>
+  <main class="container my-5">
+    <section class="mx-auto gradient-card" style="max-width: 900px;">
+      <h1 class="text-center mb-4 text-white">🤖 InstaCaption AI</h1>
 
       <form method="POST" enctype="multipart/form-data" class="mb-4">
-        <input type="file" name="image" accept="image/*" class="form-control mb-3" required>
+        <label class="form-label text-white">🖼️ Upload an Image</label>
+
+        <div class="upload-zone" id="drop-area" onclick="document.getElementById('imageInput').click()">
+          <input type="file" id="imageInput" name="image" accept="image/*" hidden>
+          <div id="uploadPrompt">        
+            <div class="upload-icon">⬆️</div>
+            <p><strong>Click to upload</strong> or drag and drop</p>
+            <small>PNG, JPG, GIF, HEIC</small>
+          </div>
+
+          <div id="previewContainer" class="d-none">
+            <div class="preview-info">
+              <span id="fileName"></span>
+              <span id="fileSize"></span>
+              <button type="button" class="delete-btn" onclick="clearPreview()">🗑️</button>
+            </div>
+            <div class="img-preview">
+              <img id="previewImage" src="#" alt="Preview">
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3 mt-4">
+          <label for="style" class="form-label text-white">🎨 Caption Style</label>
+          <select name="style" id="style" class="form-select">
+            <option value="Default">Default</option>
+            <option value="Humorous">Humorous</option>
+            <option value="Dramatic">Dramatic</option>
+            <option value="Poetic">Poetic</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Professional">Professional</option>
+          </select>
+        </div>
+
+        <div class="mb-3 mt-4">
+          <label for="context" class="form-label text-white">🗒️ Additional Info/Context (Optional)</label>
+          <textarea
+            name="context"
+            id="context"
+            class="form-control"
+            rows="3"
+            placeholder="E.g., 'This is my dog, Ozzie, and we are in Kite Beach.'"
+          ></textarea>
+        </div>
+
+        <div id="formMessage" class="form-message d-none"></div>
+        <br>
         <button type="submit" class="btn btn-primary w-100">Generate Caption</button>
       </form>
 
+      <div id="loader" class="d-none text-center mt-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span class="text-white ms-2">Analyzing image…</span>
+      </div>
+
       {% if image_url %}
-        <div>
-          <h4 class="mt-4 text-white">🔍 Uploaded Image</h4>
-          <img src="{{ image_url }}" class="img-fluid rounded mb-3" alt="Uploaded Image">
-
-          {% if detected_objects %}
-            <h5 class="text-white mt-4">🧠 Detected Objects</h5>
-            <ul class="custom-list">
-              {% for obj in detected_objects %}
-                <li>{{ obj }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-
-          {% if spatial_relationships %}
-            <h5 class="text-white mt-4">📐 Spatial Relationships</h5>
-            <ul class="custom-list">
-              {% for rel in spatial_relationships %}
-                <li>{{ rel }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
+        <article class="output-section fade-in">
+          <div class="img-container mb-4">
+            <h5 class="mb-3 text-white">🚀 Uploaded Image</h5>
+            <img src="{{ image_url }}" class="img-fluid rounded" alt="Uploaded Image">
+          </div>
 
           {% if caption %}
-            <h5 class="text-white mt-4">📝 Generated Caption</h5>
-            <div class="caption-box mt-2">
-              {{ caption }}
+            <div class="output-card">
+              <h5 class="mb-3 text-white">✨ Generated '{{ style }}' Caption</h5>
+              <div class="caption-box caption-flex">
+                <span class="caption-text">{{ caption }}</span>
+                <button class="btn copy-btn" onclick="copyCaption()">📋 Copy</button>
+              </div>
             </div>
-          {% endif %}
+          
+            
+            <section class="metadata-wrapper">
+              <h5 class="metadata-title text-white text-center mb-4">
+                🧠 How was this caption generated?
+              </h5>
+              <p class="muted">The following information was used to logically interpret and imagine the photo.</p>
+            
+              <div class="metadata-buttons">
+                <button type="button" class="glass-btn" onclick="showMeta('visual')">🕵🏻‍♂️ Visualized Detection</button>
+                <button type="button" class="glass-btn" onclick="showMeta('objects')">🔍 Detected Objects</button>
+                <button type="button" class="glass-btn" onclick="showMeta('relationships')">📐 Spatial Relationships</button>
+                <button type="button" class="glass-btn" onclick="showMeta('scene')">🌍 Scene & Environment</button>
+                <button type="button" class="glass-btn" onclick="showMeta('performance')">⏱️ Performance Stats</button>
+              </div>
+            </section>
 
-          {% if timing %}
-            <div class="mt-4 p-3 rounded bg-dark text-white shadow-sm">
-              <h5 class="text-white mb-3">🕒 Performance Stats</h5>
-              <ul class="mb-0">
-                <li><strong>Detection Time:</strong> {{ timing.detection | round(2) }}s</li>
-                <li><strong>Caption Generation Time:</strong> {{ timing.caption | round(2) }}s</li>
-                <li><strong>Total Processing Time:</strong> {{ timing.total | round(2) }}s</li>
-                <li><strong>Peak Memory Usage:</strong> {{ timing.memory | round(2) }} MB</li>
-              </ul>
-            </div>
+            <!-- Metadata Panels -->
+            {% if boxed_image_url %}
+              <div id="meta-visual" class="output-card d-none">
+                <h5 class="mb-3 text-white">🕵🏻‍♂️ Visualized Detection</h5>
+                <div class="img-container">
+                  <img src="{{ boxed_image_url }}" class="img-fluid rounded" alt="Detection Result">
+                </div>
+              </div>
+            {% endif %}
+
+            {% if detected_objects %}
+              <div id="meta-objects" class="output-card d-none">
+                <h5 class="mb-3 text-white">🔍 Detected Objects</h5>
+                <ul class="custom-list">
+                  {% for obj in detected_objects %}
+                    <li>{{ obj }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+
+            {% if spatial_relationships %}
+              <div id="meta-relationships" class="output-card d-none">
+                <h5 class="mb-3 text-white">📐 Spatial Relationships</h5>
+                <ul class="custom-list">
+                  {% for rel in spatial_relationships %}
+                    <li>{{ rel }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+
+            {% if environment_description %}
+              <div id="meta-scene" class="output-card d-none">
+                <h5 class="mb-3 text-white">🌍 Scene & Environment</h5>
+                <p>The AI model has predicted '{{ environment_description }}'</p>
+              </div>
+            {% endif %}
+
+            {% if timing %}
+              <div id="meta-performance" class="output-card d-none">
+                <h5 class="mb-3 text-white">⏱️ Performance Stats</h5>
+                <ul class="stat-list">
+                  <li><span class="stat-label">Detection:</span> {{ timing.detection | round(2) }}s</li>
+                  <li><span class="stat-label">Caption:</span> {{ timing.caption | round(2) }}s</li>
+                  <li><span class="stat-label">Total:</span> {{ timing.total | round(2) }}s</li>
+                  <li><span class="stat-label">Memory:</span> {{ timing.memory | round(2) }} MB</li>
+                </ul>
+              </div>
+            {% endif %}
           {% endif %}
-        </div>
+        </article>
       {% endif %}
-    </div>
-  </div>
+    </section>
+  </main>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
