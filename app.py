@@ -5,6 +5,9 @@ import tracemalloc
 import uuid
 from werkzeug.utils import secure_filename
 
+os.makedirs("static/uploads", exist_ok=True)
+os.makedirs("static/outputs", exist_ok=True)
+
 from utils.detect import detect_objects
 from utils.spatial import describe_spatial_relationships
 from utils.caption import build_prompt, generate_caption
@@ -13,6 +16,7 @@ from utils.draw_boxes import draw_boxes
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
