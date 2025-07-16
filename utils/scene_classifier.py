@@ -2,6 +2,7 @@ import torch
 from torchvision import models, transforms
 from PIL import Image
 import os
+import urllib.request
 
 # Load category labels from local file
 def load_categories():
@@ -16,15 +17,17 @@ def load_categories():
         classes = [line.strip().split(' ')[0][3:] for line in f]
     return classes
 
-# Load model weights from local file
 def load_model():
-    model_path = os.path.join("models", "resnet18_places365.pth.tar")
+    model_dir = "models"
+    os.makedirs(model_dir, exist_ok=True)
+    model_path = os.path.join(model_dir, "resnet18_places365.pth.tar")
+
     if not os.path.exists(model_path):
-        raise FileNotFoundError(
-            f"Missing model file: {model_path}\n"
-            "Download it from:\n"
-            "http://places2.csail.mit.edu/models_places365/resnet18_places365.pth.tar"
-        )
+        print("Downloading ResNet18 Places365 model...")
+        url = "http://places2.csail.mit.edu/models_places365/resnet18_places365.pth.tar"
+        urllib.request.urlretrieve(url, model_path)
+        print("Download complete.")
+
     model = models.resnet18(num_classes=365)
     checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
     state_dict = {k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()}
